@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neutron Star Merger Simulator — Interactive Multi-Messenger Astrophysics</title>
+<meta name="description" content="Interactive simulation of binary neutron star mergers based on GW170817 observations. Explore gravitational waves, kilonovae, gamma-ray bursts, and r-process nucleosynthesis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+</head>
+<body>
+
+<!-- ======================================================================
+     HTML STRUCTURE
+     ====================================================================== -->
+<div id="app">
+  <!-- HEADER -->
+  <header id="header">
+    <div>
+      <h1>NEUTRON STAR MERGER SIMULATOR</h1>
+      <span class="subtitle">Multi-Messenger Astrophysics • Based on GW170817</span>
+    </div>
+    <div class="header-right">
+      <span id="phase-badge" class="phase-badge">INSPIRAL</span>
+      <button class="learn-btn" id="learn-btn" title="Open educational content">📚 Learn</button>
+    </div>
+  </header>
+
+  <!-- 3D VIEWPORT -->
+  <div id="viewport-panel">
+    <canvas id="three-canvas"></canvas>
+    <div id="scene-annotations">
+      <div class="scene-annotation" id="ann-star1">Neutron star 1<span class="sub">dense stellar remnant</span></div>
+      <div class="scene-annotation" id="ann-star2">Neutron star 2<span class="sub">binary companion</span></div>
+      <div class="scene-annotation" id="ann-gw">Gravitational waves<span class="sub">amplified spacetime ripples</span></div>
+      <div class="scene-annotation" id="ann-remnant">Compact remnant<span class="sub">massive NS or black hole</span></div>
+      <div class="scene-annotation" id="ann-blackhole">Black hole<span class="sub">collapsed central remnant</span></div>
+      <div class="scene-annotation" id="ann-disk">Accretion disk<span class="sub">hot orbiting debris</span></div>
+      <div class="scene-annotation" id="ann-ejecta">Merger ejecta<span class="sub">neutron-rich expelled matter</span></div>
+      <div class="scene-annotation" id="ann-jets">Relativistic outflow<span class="sub">beamed jet along the poles</span></div>
+      <div class="scene-annotation" id="ann-kilonova">Kilonova<span class="sub">radioactively powered transient</span></div>
+      <div class="scene-annotation" id="ann-radio">Radio flare<span class="sub">late synchrotron afterglow</span></div>
+    </div>
+    <button id="annotation-toggle" class="active">Labels on</button>
+    <div id="viewport-phase-label">INSPIRAL</div>
+    <div id="viewport-time-label">t = −6.5 s</div>
+    <div id="evolution-caption"><strong>Inspiral</strong><span class="detail">The stars lose orbital energy through gravitational waves and spiral closer together.</span></div>
+    <div id="immersive-hint">Drag to orbit • Scroll to zoom • GW ripples are visually amplified</div>
+    <div class="viewport-hint">Drag to orbit • Scroll to zoom</div>
+    <div class="scene-chip"><span>Physics-informed</span><span>Visual scales amplified</span></div>
+    <div id="viewport-overlay">
+      <button class="play-btn" id="play-btn">▶ Play</button>
+      <button class="reset-btn" id="reset-btn">↺ Reset</button>
+      <button class="skip-btn" id="skip-merger" title="Skip to merger">⏭ Merger</button>
+      <button class="skip-btn" id="skip-kilonova" title="Skip to kilonova">⏭ Kilonova</button>
+      <button class="skip-btn" id="skip-afterglow" title="Skip to afterglow">⏭ Afterglow</button>
+      <div class="speed-control">
+        <label>Speed</label>
+        <input type="range" id="speed-slider" min="-1" max="3" step="0.1" value="0.4">
+        <span id="speed-label">2.5×</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <!-- Controls -->
+    <div id="controls-panel" class="panel">
+      <div class="panel-title">Parameters</div>
+      <div class="control-group">
+        <div class="control-group-label">Binary System</div>
+        <div class="control-row">
+          <label>Star 1</label>
+          <input type="range" id="ctrl-m1" min="1.0" max="2.5" step="0.05" value="1.4">
+          <span class="value" id="val-m1">1.40 M☉</span>
+        </div>
+        <div class="control-row">
+          <label>Star 2</label>
+          <input type="range" id="ctrl-m2" min="1.0" max="2.5" step="0.05" value="1.3">
+          <span class="value" id="val-m2">1.30 M☉</span>
+        </div>
+        <div class="control-row">
+          <label>EOS</label>
+          <select class="eos-select" id="ctrl-eos">
+            <option value="APR4">APR4 — Soft (R≈11 km)</option>
+            <option value="SLy" selected>SLy — Medium (R≈11.7 km)</option>
+            <option value="H4">H4 — Stiff (R≈13.8 km)</option>
+            <option value="MS1">MS1 — Very Stiff (R≈14.9 km)</option>
+          </select>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="control-group-label">Physics</div>
+        <div class="control-row">
+          <label>B Field</label>
+          <input type="range" id="ctrl-bfield" min="10" max="15" step="0.5" value="12">
+          <span class="value" id="val-bfield">10¹² G</span>
+        </div>
+        <div class="control-row">
+          <label>Separation</label>
+          <input type="range" id="ctrl-sep" min="100" max="500" step="10" value="200">
+          <span class="value" id="val-sep">200 km</span>
+        </div>
+        <div class="control-row">
+          <label>Spin</label>
+          <input type="range" id="ctrl-spin" min="0" max="0.4" step="0.05" value="0.05">
+          <span class="value" id="val-spin">0.05</span>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="control-group-label">Observer</div>
+        <div class="control-row">
+          <label>Inclination</label>
+          <input type="range" id="ctrl-incl" min="0" max="90" step="5" value="30">
+          <span class="value" id="val-incl">30°</span>
+        </div>
+        <div class="control-row">
+          <label>Distance</label>
+          <input type="range" id="ctrl-dist" min="10" max="200" step="5" value="40">
+          <span class="value" id="val-dist">40 Mpc</span>
+        </div>
+      </div>
+    </div>
+    <!-- Info Panel -->
+    <div id="info-panel" class="panel">
+      <div class="panel-title">Live Data</div>
+      <div class="info-grid">
+        <div class="info-item"><span class="label">Separation</span><span class="val" id="info-sep">200 km</span></div>
+        <div class="info-item"><span class="label">Orb. Vel.</span><span class="val" id="info-vel">0.10 c</span></div>
+        <div class="info-item"><span class="label">GW Freq</span><span class="val" id="info-fgw">72 Hz</span></div>
+        <div class="info-item"><span class="label">GW Strain</span><span class="val" id="info-strain">1.2e-22</span></div>
+        <div class="info-item"><span class="label">Chirp Mass</span><span class="val" id="info-mchirp">1.19 M☉</span></div>
+        <div class="info-item"><span class="label">Remnant</span><span class="val" id="info-remnant">—</span></div>
+        <div class="info-item"><span class="label">Ejecta</span><span class="val" id="info-ejecta">—</span></div>
+        <div class="info-item"><span class="label">Luminosity</span><span class="val" id="info-lum">—</span></div>
+        <div class="info-item"><span class="label">Temperature</span><span class="val" id="info-temp">—</span></div>
+        <div class="info-item"><span class="label">Energy</span><span class="val" id="info-energy">0 erg</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM PANELS -->
+  <div id="panels-area">
+    <div class="chart-panel">
+      <div class="panel-title">Gravitational Wave Signal</div>
+      <canvas id="gw-canvas"></canvas>
+    </div>
+    <div class="chart-panel">
+      <div class="panel-title">Electromagnetic Spectrum</div>
+      <canvas id="em-canvas"></canvas>
+      <div class="em-legend">
+        <span class="em-legend-item"><span class="em-legend-dot" style="background:var(--gamma-color)"></span>γ-ray</span>
+        <span class="em-legend-item"><span class="em-legend-dot" style="background:var(--xray-color)"></span>X-ray</span>
+        <span class="em-legend-item"><span class="em-legend-dot" style="background:var(--uv-color)"></span>UV</span>
+        <span class="em-legend-item"><span class="em-legend-dot" style="background:var(--optical-color)"></span>Optical</span>
+        <span class="em-legend-item"><span class="em-legend-dot" style="background:var(--ir-color)"></span>IR</span>
+        <span class="em-legend-item"><span class="em-legend-dot" style="background:var(--radio-color)"></span>Radio</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div id="timeline-panel">
+    <div id="timeline-track">
+      <div id="timeline-bar"></div>
+      <div id="timeline-progress"></div>
+      <div id="timeline-cursor"></div>
+    </div>
+    <span id="timeline-time-label">t = −6.5 s</span>
+  </div>
+</div>
+
+<!-- EDUCATIONAL MODAL -->
+<div id="edu-modal-overlay">
+  <div id="edu-modal">
+    <div class="modal-icon" id="edu-icon">🌟</div>
+    <h2 id="edu-title">Title</h2>
+    <p class="question" id="edu-question">Question?</p>
+    <p class="explanation" id="edu-explanation">Explanation</p>
+    <div class="equation" id="edu-equation" style="display:none;"></div>
+    <div class="modal-nav">
+      <button id="edu-prev">← Previous</button>
+      <span id="edu-counter" style="font-size:11px;color:var(--text-muted);">1 / 18</span>
+      <button id="edu-next">Next →</button>
+      <button class="modal-close" id="edu-close">✕ Close</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ======================================================================
+     THREE.JS IMPORT MAP
+     ====================================================================== -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/"
+  }
+}
+</script>
+
+<!-- ======================================================================
+     MAIN APPLICATION SCRIPT
+     ====================================================================== -->
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
