@@ -605,24 +605,7 @@ body {
   backdrop-filter: blur(8px);
   pointer-events: none;
 }
-.scene-chip {
-  position: absolute;
-  right: 16px;
-  top: 38px;
-  display: flex;
-  gap: 6px;
-  pointer-events: none;
-}
-.scene-chip span {
-  padding: 4px 7px;
-  border-radius: 999px;
-  background: rgba(4, 9, 22, 0.58);
-  border: 1px solid rgba(130, 180, 255, 0.12);
-  color: rgba(190, 208, 238, 0.72);
-  font-size: 8px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
+
 
 
 /* ========================================================================
@@ -719,6 +702,295 @@ body {
   50% { box-shadow: 0 0 15px var(--accent-cyan), 0 0 30px rgba(0,212,255,0.3); }
 }
 .pulsing { animation: pulse 2s ease-in-out infinite; }
+
+
+/* ========================================================================
+   MOBILE AND TIMELINE REFINEMENTS
+   ======================================================================== */
+#timeline-panel {
+  padding: 10px 14px;
+  gap: 14px;
+  min-height: 66px;
+  background: linear-gradient(180deg, rgba(10, 15, 34, 0.94), rgba(5, 9, 23, 0.94));
+}
+#timeline-track {
+  height: 42px;
+  padding-inline: 4px;
+}
+#timeline-bar {
+  top: 22px;
+  height: 5px;
+  background: rgba(165, 188, 225, 0.14);
+  border: 1px solid rgba(160, 205, 255, 0.08);
+  border-radius: 999px;
+}
+#timeline-progress {
+  top: 22px;
+  height: 5px;
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.28);
+}
+#timeline-cursor {
+  top: 16px;
+  width: 17px;
+  height: 17px;
+  transform: translateX(-8.5px);
+  border: 3px solid rgba(230, 250, 255, 0.92);
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.14), 0 0 15px rgba(0, 212, 255, 0.7);
+}
+#timeline-track.dragging #timeline-cursor {
+  transform: translateX(-8.5px) scale(1.15);
+}
+.tl-event {
+  top: 0;
+  font-size: 8px;
+  letter-spacing: 0.02em;
+}
+.tl-event .dot {
+  width: 7px;
+  height: 7px;
+  margin-top: 5px;
+  border: 1px solid rgba(220, 235, 255, 0.18);
+}
+.tl-event.active .dot {
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.75);
+}
+#timeline-time-label {
+  min-width: 112px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(120,180,255,0.1);
+  color: #b9cbe0;
+}
+
+@media (max-width: 1100px) {
+  html, body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  #app {
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    grid-template-areas:
+      "header"
+      "viewport"
+      "timeline"
+      "sidebar"
+      "panels";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(420px, 62vh) auto auto auto;
+    gap: 8px;
+    padding: 8px;
+    overflow: visible;
+  }
+  #header {
+    min-height: 52px;
+    gap: 10px;
+  }
+  #header h1 { font-size: 14px; }
+  #header .subtitle { display: block; font-size: 9px; margin-top: 2px; }
+  #viewport-panel { min-height: 420px; }
+  #sidebar {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+    overflow: visible;
+  }
+  #controls-panel, #info-panel {
+    max-height: none;
+    overflow: visible;
+  }
+  #panels-area {
+    grid-template-columns: 1fr 1fr;
+  }
+  .chart-panel { min-height: 250px; }
+}
+
+@media (max-width: 760px) {
+  #app {
+    grid-template-rows: auto minmax(390px, 68vh) auto auto auto;
+    padding: 5px;
+    gap: 5px;
+  }
+  #header {
+    padding: 8px 10px;
+    align-items: flex-start;
+  }
+  #header h1 {
+    font-size: 12px;
+    letter-spacing: .25px;
+  }
+  #header .subtitle {
+    font-size: 8px;
+    line-height: 1.35;
+  }
+  .header-right { gap: 6px; }
+  .phase-badge {
+    font-size: 8px;
+    padding: 3px 7px;
+    letter-spacing: .6px;
+  }
+  .learn-btn {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+  #viewport-panel {
+    min-height: 390px;
+    border-radius: 12px;
+  }
+  #viewport-phase-label {
+    top: 10px;
+    left: 10px;
+    font-size: 11px;
+  }
+  #viewport-time-label {
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+  }
+  .viewport-hint, #immersive-hint { display: none; }
+  #annotation-toggle {
+    top: 34px;
+    right: 9px;
+    font-size: 8px;
+    padding: 4px 7px;
+  }
+  #evolution-caption {
+    top: auto !important;
+    left: 9px !important;
+    right: auto !important;
+    bottom: 76px !important;
+    width: auto !important;
+    max-width: min(62vw, 255px) !important;
+    padding: 6px 8px !important;
+    border-radius: 8px !important;
+    background: rgba(3, 8, 20, 0.58) !important;
+    backdrop-filter: blur(6px) !important;
+    line-height: 1.25 !important;
+  }
+  #evolution-caption strong {
+    display: block;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+  }
+  #evolution-caption .detail {
+    display: -webkit-box !important;
+    margin-top: 2px !important;
+    overflow: hidden !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+    font-size: 7px !important;
+    line-height: 1.25 !important;
+  }
+  #viewport-overlay {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 8px;
+    background: linear-gradient(to top, rgba(0,0,0,.88), rgba(0,0,0,.05));
+  }
+  .play-btn, .reset-btn, .skip-btn {
+    min-height: 34px;
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+  .play-btn { padding-inline: 15px; }
+  .speed-control {
+    flex: 1 1 145px;
+    min-width: 140px;
+    justify-content: flex-end;
+  }
+  .speed-control input[type="range"] { width: min(100px, 24vw); }
+
+  #timeline-panel {
+    position: relative;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+    padding: 8px 10px 7px;
+    min-height: 72px;
+  }
+  #timeline-track {
+    order: 2;
+    width: 100%;
+    height: 45px;
+  }
+  #timeline-time-label {
+    order: 1;
+    align-self: flex-end;
+    min-width: 0;
+    font-size: 9px;
+    padding: 3px 7px;
+  }
+  .tl-event span { display: none; }
+  .tl-event:nth-of-type(4) span,
+  .tl-event:nth-of-type(6) span,
+  .tl-event:nth-of-type(9) span,
+  .tl-event:nth-of-type(12) span,
+  .tl-event:nth-of-type(15) span {
+    display: inline;
+    font-size: 7px;
+  }
+  .tl-event .dot { margin-top: 15px; }
+  .tl-event:nth-of-type(4) .dot,
+  .tl-event:nth-of-type(6) .dot,
+  .tl-event:nth-of-type(9) .dot,
+  .tl-event:nth-of-type(12) .dot,
+  .tl-event:nth-of-type(15) .dot { margin-top: 5px; }
+
+  #sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .panel { padding: 10px; }
+  #info-panel { max-height: none; }
+  .info-grid { grid-template-columns: 1fr 1fr; }
+  #panels-area {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .chart-panel { min-height: 230px; }
+  .em-legend { gap: 4px 6px; }
+  .em-legend-item { font-size: 8px; padding: 2px 5px; }
+  #edu-modal {
+    width: calc(100% - 18px);
+    max-height: 88vh;
+    padding: 18px 16px;
+  }
+  #edu-modal h2 { font-size: 18px; }
+  #edu-modal .explanation { font-size: 13px; line-height: 1.55; }
+  .modal-nav { flex-wrap: wrap; }
+}
+
+@media (max-width: 430px) {
+  #app { grid-template-rows: auto minmax(360px, 65vh) auto auto auto; }
+  #viewport-panel { min-height: 360px; }
+  #header .subtitle { max-width: 210px; }
+  .skip-btn { padding-inline: 8px; }
+  .control-row label { font-size: 11px; }
+  .control-row .value { font-size: 10px; min-width: 50px; }
+  .info-grid { gap: 3px 8px; }
+  .info-item .label { font-size: 8px; }
+  .info-item .val { font-size: 9px; }
+}
+
+@media (max-width: 480px) {
+  #evolution-caption {
+    max-width: 54vw !important;
+    padding: 5px 7px !important;
+  }
+  #evolution-caption .detail { display: none !important; }
+  #evolution-caption strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -754,13 +1026,12 @@ body {
       <div class="scene-annotation" id="ann-kilonova">Kilonova<span class="sub">radioactively powered transient</span></div>
       <div class="scene-annotation" id="ann-radio">Radio flare<span class="sub">late synchrotron afterglow</span></div>
     </div>
-    <button id="annotation-toggle" class="active">Labels on</button>
+    <button id="annotation-toggle">Labels off</button>
     <div id="viewport-phase-label">INSPIRAL</div>
     <div id="viewport-time-label">t = −6.5 s</div>
     <div id="evolution-caption"><strong>Inspiral</strong><span class="detail">The stars lose orbital energy through gravitational waves and spiral closer together.</span></div>
     <div id="immersive-hint">Drag to orbit • Scroll to zoom • GW ripples are visually amplified</div>
     <div class="viewport-hint">Drag to orbit • Scroll to zoom</div>
-    <div class="scene-chip"><span>Physics-informed</span><span>Visual scales amplified</span></div>
     <div id="viewport-overlay">
       <button class="play-btn" id="play-btn">▶ Play</button>
       <button class="reset-btn" id="reset-btn">↺ Reset</button>
@@ -1338,7 +1609,7 @@ const state = {
   visualOrbitalPhase: 0,
   visualInspiralDuration: 18,
   initialSeparation: 200 * PHYS.km,
-  annotationsEnabled: true,
+  annotationsEnabled: false,
 };
 
 function initSimulation() {
