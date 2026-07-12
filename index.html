@@ -214,13 +214,6 @@ body {
   text-shadow: 0 0 20px rgba(0,212,255,0.5);
   pointer-events: none;
 }
-#immersive-hint {
-  position:absolute; left:16px; bottom:54px; z-index:4;
-  padding:7px 10px; border-radius:999px;
-  background:rgba(3,8,22,.62); border:1px solid rgba(122,233,255,.2);
-  color:#8fa5c5; font-size:9px; letter-spacing:.04em; pointer-events:none;
-  backdrop-filter:blur(8px);
-}
 #viewport-time-label {
   position: absolute;
   top: 12px;
@@ -373,7 +366,7 @@ body {
 #panels-area {
   grid-area: panels;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
 .chart-panel {
@@ -415,6 +408,69 @@ body {
   border-radius: 50%;
 }
 
+
+.outcome-panel { min-height: 0; }
+.outcome-validity {
+  margin: -2px 0 7px;
+  font-size: 8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  flex: 1;
+}
+.outcome-card {
+  min-width: 0;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(90,130,190,.14);
+  background: rgba(255,255,255,.028);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.outcome-card.outcome-primary { border-color: rgba(0,212,255,.22); }
+.outcome-label {
+  font-size: 8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.outcome-card strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+.outcome-card small {
+  display: block;
+  margin-top: 4px;
+  font-size: 7.5px;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+.outcome-reason {
+  margin-top: 6px;
+  min-height: 22px;
+  font-size: 8px;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+@media (max-width: 620px) {
+  .outcome-grid { grid-template-columns: 1fr; }
+  .outcome-card { padding: 9px 10px; }
+  .outcome-card small { font-size: 8px; }
+}
+@media (max-width: 1350px) and (min-width: 1101px) {
+  #panels-area { grid-template-columns: 1fr 1fr; }
+  .remnant-chart-panel { grid-column: 1 / -1; }
+}
+
 /* ========================================================================
    TIMELINE
    ======================================================================== */
@@ -424,7 +480,7 @@ body {
   backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 8px 16px;
+  padding: 7px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -432,7 +488,7 @@ body {
 }
 #timeline-track {
   flex: 1;
-  height: 36px;
+  height: 46px;
   position: relative;
   cursor: ew-resize;
   touch-action: none;
@@ -442,7 +498,7 @@ body {
 #timeline-track:hover #timeline-bar { background: rgba(255,255,255,0.14); }
 #timeline-bar {
   position: absolute;
-  top: 16px;
+  top: 22px;
   left: 0;
   right: 0;
   height: 3px;
@@ -451,7 +507,7 @@ body {
 }
 #timeline-progress {
   position: absolute;
-  top: 16px;
+  top: 22px;
   left: 0;
   height: 3px;
   background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
@@ -460,7 +516,7 @@ body {
 }
 #timeline-cursor {
   position: absolute;
-  top: 12px;
+  top: 18px;
   width: 10px;
   height: 10px;
   background: var(--accent-cyan);
@@ -468,24 +524,31 @@ body {
   transform: translateX(-5px);
   box-shadow: 0 0 8px var(--accent-cyan);
   z-index: 5;
+  transition: left 100ms linear;
 }
+#timeline-track.dragging #timeline-cursor,
+#timeline-track.dragging #timeline-progress { transition: none; }
 .tl-event {
   position: absolute;
-  top: 0;
+  top: 2px;
   transform: translateX(-50%);
   text-align: center;
-  font-size: 8px;
+  font-size: 9px;
   color: var(--text-muted);
   transition: color var(--transition-fast);
   white-space: nowrap;
 }
+.tl-event.below { top: 25px; }
+.tl-event.below .dot { order: -1; }
+.tl-event.edge-start { transform: none; text-align: left; }
+.tl-event.edge-end { transform: translateX(-100%); text-align: right; }
 .tl-event.active { color: var(--accent-cyan); }
 .tl-event .dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--text-muted);
-  margin: 2px auto 2px;
+  margin: 2px auto;
   transition: all var(--transition-fast);
 }
 .tl-event.active .dot {
@@ -498,6 +561,12 @@ body {
   color: var(--text-secondary);
   min-width: 90px;
   text-align: right;
+}
+#timeline-scale-note {
+  font-size: 8px;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 /* ========================================================================
@@ -590,21 +659,6 @@ body {
 }
 
 /* Refined viewport overlays */
-.viewport-hint {
-  position: absolute;
-  left: 16px;
-  top: 38px;
-  max-width: 310px;
-  padding: 7px 10px;
-  border-radius: 8px;
-  background: rgba(3, 7, 18, 0.56);
-  border: 1px solid rgba(120, 180, 255, 0.12);
-  color: rgba(205, 220, 245, 0.68);
-  font-size: 9px;
-  letter-spacing: 0.03em;
-  backdrop-filter: blur(8px);
-  pointer-events: none;
-}
 
 
 
@@ -646,6 +700,14 @@ body {
   width: 24px;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(123, 216, 255, .7));
+}
+/* When a label sits to the LEFT of the point it describes, the leader line
+   must extend to the right instead — otherwise it visually points away
+   from the object it's labeling. */
+.scene-annotation.leader-right::before {
+  right: auto;
+  left: 100%;
+  background: linear-gradient(270deg, transparent, rgba(123, 216, 255, .7));
 }
 .scene-annotation .sub {
   display: block;
@@ -746,6 +808,7 @@ body {
   font-size: 8px;
   letter-spacing: 0.02em;
 }
+.tl-event.below { top: 27px; }
 .tl-event .dot {
   width: 7px;
   height: 7px;
@@ -1030,9 +1093,7 @@ body {
     <div id="viewport-phase-label">INSPIRAL</div>
     <div id="viewport-time-label">t = −6.5 s</div>
     <div id="evolution-caption"><strong>Inspiral</strong><span class="detail">The stars lose orbital energy through gravitational waves and spiral closer together.</span></div>
-    <div id="immersive-hint">Drag to orbit • Scroll to zoom • GW ripples are visually amplified</div>
-    <div class="viewport-hint">Drag to orbit • Scroll to zoom</div>
-    <div id="viewport-overlay">
+<div id="viewport-overlay">
       <button class="play-btn" id="play-btn">▶ Play</button>
       <button class="reset-btn" id="reset-btn">↺ Reset</button>
       <button class="skip-btn" id="skip-merger" title="Skip to merger">⏭ Merger</button>
@@ -1040,8 +1101,8 @@ body {
       <button class="skip-btn" id="skip-afterglow" title="Skip to afterglow">⏭ Afterglow</button>
       <div class="speed-control">
         <label>Speed</label>
-        <input type="range" id="speed-slider" min="-1" max="3" step="0.1" value="0.778151">
-        <span id="speed-label">6×</span>
+        <input type="range" id="speed-slider" min="-1" max="3" step="0.1" value="0.60206">
+        <span id="speed-label">4×</span>
       </div>
     </div>
   </div>
@@ -1115,6 +1176,9 @@ body {
         <div class="info-item"><span class="label">GW Strain</span><span class="val" id="info-strain">1.2e-22</span></div>
         <div class="info-item"><span class="label">Chirp Mass</span><span class="val" id="info-mchirp">1.19 M☉</span></div>
         <div class="info-item"><span class="label">Remnant</span><span class="val" id="info-remnant">—</span></div>
+        <div class="info-item"><span class="label">TOV limit</span><span class="val" id="info-tov">—</span></div>
+        <div class="info-item"><span class="label">Uniform limit</span><span class="val" id="info-uniform">—</span></div>
+        <div class="info-item"><span class="label">Prompt BH</span><span class="val" id="info-prompt">—</span></div>
         <div class="info-item"><span class="label">Ejecta</span><span class="val" id="info-ejecta">—</span></div>
         <div class="info-item"><span class="label">Luminosity</span><span class="val" id="info-lum">—</span></div>
         <div class="info-item"><span class="label">Temperature</span><span class="val" id="info-temp">—</span></div>
@@ -1130,7 +1194,7 @@ body {
       <canvas id="gw-canvas"></canvas>
     </div>
     <div class="chart-panel">
-      <div class="panel-title">Electromagnetic Spectrum</div>
+      <div class="panel-title">Electromagnetic Signal</div>
       <canvas id="em-canvas"></canvas>
       <div class="em-legend">
         <span class="em-legend-item"><span class="em-legend-dot" style="background:var(--gamma-color)"></span>γ-ray</span>
@@ -1141,10 +1205,33 @@ body {
         <span class="em-legend-item"><span class="em-legend-dot" style="background:var(--radio-color)"></span>Radio</span>
       </div>
     </div>
+    <div class="chart-panel remnant-chart-panel outcome-panel">
+      <div class="panel-title">Predicted Merger Outcome</div>
+      <div id="outcome-validity" class="outcome-validity">Numerical-relativity surrogate</div>
+      <div class="outcome-grid">
+        <article class="outcome-card outcome-primary">
+          <span class="outcome-label">Representative remnant</span>
+          <strong id="outcome-remnant">—</strong>
+          <small id="outcome-threshold">Outcome updates with mass and EOS.</small>
+        </article>
+        <article class="outcome-card">
+          <span class="outcome-label">Dynamical ejecta</span>
+          <strong id="outcome-ejecta">—</strong>
+          <small id="outcome-ejecta-note">Matter thrown out during the collision.</small>
+        </article>
+        <article class="outcome-card">
+          <span class="outcome-label">Bound accretion disk</span>
+          <strong id="outcome-disk">—</strong>
+          <small id="outcome-disk-note">Hot matter remaining around the remnant.</small>
+        </article>
+      </div>
+      <div id="outcome-reason" class="outcome-reason">Change the masses or EOS to explore other outcomes.</div>
+    </div>
   </div>
 
   <!-- TIMELINE -->
   <div id="timeline-panel">
+    <span id="timeline-scale-note">LOG TIME<br>AFTER MERGER</span>
     <div id="timeline-track">
       <div id="timeline-bar"></div>
       <div id="timeline-progress"></div>
@@ -1214,10 +1301,12 @@ const PHYS = {
 // References: Lattimer & Prakash 2001, Read et al. 2009, GW170817 (Abbott+ 2017)
 // ========================================================================
 const EOS_MODELS = {
-  APR4: { name: 'APR4', label: 'Soft', radiusAt1_4: 11.1, tovMass: 2.20, tidalDeformability: 270, thresholdFactor: 1.35, gammaIndex: 2.0 },
-  SLy:  { name: 'SLy',  label: 'Medium', radiusAt1_4: 11.7, tovMass: 2.05, tidalDeformability: 300, thresholdFactor: 1.40, gammaIndex: 2.2 },
-  H4:   { name: 'H4',   label: 'Stiff', radiusAt1_4: 13.8, tovMass: 2.03, tidalDeformability: 700, thresholdFactor: 1.55, gammaIndex: 2.5 },
-  MS1:  { name: 'MS1',  label: 'Very Stiff', radiusAt1_4: 14.9, tovMass: 2.77, tidalDeformability: 1400, thresholdFactor: 1.70, gammaIndex: 3.0 },
+  // radiusAtMaximumMassKm is used in the compactness-based prompt-collapse fit.
+  // APR4 and SLy values follow the reference sequences used by the laboratory model.
+  APR4: { name: 'APR4', label: 'Soft', radiusAt1_4: 11.37, radiusAtMaximumMassKm: 9.97, tovMass: 2.19, tidalDeformability: 270, gammaIndex: 2.0 },
+  SLy:  { name: 'SLy5', label: 'Medium', radiusAt1_4: 11.90, radiusAtMaximumMassKm: 10.85, tovMass: 2.02, tidalDeformability: 317, gammaIndex: 2.2 },
+  H4:   { name: 'H4', label: 'Stiff', radiusAt1_4: 13.8, radiusAtMaximumMassKm: 11.6, tovMass: 2.03, tidalDeformability: 700, gammaIndex: 2.5 },
+  MS1:  { name: 'MS1', label: 'Very Stiff', radiusAt1_4: 14.9, radiusAtMaximumMassKm: 13.2, tovMass: 2.77, tidalDeformability: 1400, gammaIndex: 3.0 },
 };
 
 // ========================================================================
@@ -1306,15 +1395,58 @@ function generateWaveformSample(A, phase, inclination) {
 // References: Bauswein+ 2013, Hotokezaka+ 2013
 // ========================================================================
 
-function determineRemnantType(m1s, m2s, mejecta, eos) {
-  const mRem = m1s + m2s - mejecta;
+function computePromptCollapseThreshold(eos) {
+  // Bauswein-style compactness relation used by the laboratory model:
+  // M_threshold = (-3.38 C_TOV + 2.43) M_TOV.
+  const compactness = PHYS.G * eos.tovMass * PHYS.M_sun /
+    (eos.radiusAtMaximumMassKm * PHYS.km * PHYS.c * PHYS.c);
+  return (-3.38 * compactness + 2.43) * eos.tovMass;
+}
+
+function classifyRemnant(m1s, m2s, mejecta, eos) {
+  const totalMass = m1s + m2s;
+  const compactMass = Math.max(0, totalMass - mejecta);
   const mTOV = eos.tovMass;
-  const mThresh = eos.thresholdFactor * mTOV;
-  const mMaxRot = 1.2 * mTOV; // ~20% increase from uniform rotation
-  if (m1s + m2s > mThresh) return 'black_hole';
-  if (mRem > mMaxRot) return 'hypermassive_ns';
-  if (mRem > mTOV) return 'supramassive_ns';
-  return 'stable_ns';
+  const mUniform = 1.203 * mTOV;
+  const uniformUncertainty = 0.022 * mTOV;
+  const mPrompt = computePromptCollapseThreshold(eos);
+  const promptUncertainty = 0.10;
+  const q = Math.min(m1s, m2s) / Math.max(m1s, m2s);
+
+  let type;
+  let reason;
+  let validity = q >= 0.9 ? 'in-domain' : 'extrapolated';
+
+  if (totalMass > mPrompt + promptUncertainty) {
+    type = 'black_hole';
+    reason = 'The total mass exceeds the EOS-dependent prompt-collapse threshold.';
+  } else if (Math.abs(totalMass - mPrompt) <= promptUncertainty) {
+    type = totalMass >= mPrompt ? 'black_hole' : 'hypermassive_ns';
+    reason = 'The system lies close to the prompt-collapse boundary, so the outcome is uncertain.';
+    validity = 'near-boundary';
+  } else if (compactMass > mUniform + uniformUncertainty) {
+    type = 'hypermassive_ns';
+    reason = 'The remnant is below prompt collapse but above the mass supported by uniform rotation.';
+  } else if (Math.abs(compactMass - mUniform) <= uniformUncertainty) {
+    type = compactMass > mUniform ? 'hypermassive_ns' : 'supramassive_ns';
+    reason = 'The remnant lies close to the uniform-rotation support limit.';
+    validity = 'near-boundary';
+  } else if (compactMass > mTOV) {
+    type = 'supramassive_ns';
+    reason = 'Uniform rotation can temporarily support the remnant above the nonrotating TOV limit.';
+  } else {
+    type = 'stable_ns';
+    reason = 'The compact remnant mass is below the cold nonrotating TOV limit.';
+  }
+
+  return {
+    type, reason, validity, totalMass, compactMass, massRatio: q,
+    mTOV, mUniform, mPrompt, promptUncertainty, uniformUncertainty
+  };
+}
+
+function determineRemnantType(m1s, m2s, mejecta, eos) {
+  return classifyRemnant(m1s, m2s, mejecta, eos).type;
 }
 
 function computeRemnantMass(m1s, m2s, mejecta) { return m1s + m2s - mejecta; }
@@ -1324,7 +1456,12 @@ function computeDiskMass(remnantType) {
   return map[remnantType] || 0.05;
 }
 
-const REMNANT_LABELS = { black_hole: 'Black Hole', hypermassive_ns: 'Hypermassive NS', supramassive_ns: 'Supramassive NS', stable_ns: 'Stable NS' };
+const REMNANT_LABELS = {
+  black_hole: 'Prompt Black Hole',
+  hypermassive_ns: 'Hypermassive Neutron Star',
+  supramassive_ns: 'Supramassive Neutron Star',
+  stable_ns: 'Stable Massive Neutron Star'
+};
 
 // ========================================================================
 // SECTION 6: PHYSICS ENGINE — Ejecta
@@ -1363,7 +1500,14 @@ function computeHeatingRate(t) {
 /** Thermalization efficiency fit */
 function computeThermalizationEfficiency(t) {
   const tDay = Math.max(t, 60) / PHYS.day;
-  return Math.min(0.5, 0.36 * Math.exp(-0.56 * tDay) + 0.02);
+  // Barnes et al.-style bounded fit: efficient near peak, declining as the
+  // ejecta dilute. The logarithmic term prevents an unrealistically abrupt
+  // late-time cut-off.
+  const b = 0.17;
+  const d = 0.74;
+  return Math.max(0.03, Math.min(0.72,
+    0.36 * (Math.exp(-0.56 * tDay) + Math.log1p(2 * b * Math.pow(tDay, d)) / (2 * b * Math.pow(tDay, d)))
+  ));
 }
 
 /** Kilonova bolometric luminosity for blue/red component */
@@ -1374,13 +1518,14 @@ function computeKilonovaLuminosity(t, mejSolar, component) {
   const eps = computeThermalizationEfficiency(t);
   const kappa = component === 'blue' ? 1.0 : 10.0;
   const vej = component === 'blue' ? 0.25 * PHYS.c : 0.15 * PHYS.c;
-  const tPeak = Math.sqrt(2 * kappa * mej / (vej * PHYS.c * 1e2)) / 100; // CGS
+  // Grey diffusion time, normalized to commonly used kilonova scaling.
+  const tPeakDays = 1.5 * Math.sqrt(mejSolar / 0.01) * Math.sqrt(kappa) *
+    Math.sqrt((0.1 * PHYS.c) / vej);
   const tDay = t / PHYS.day;
-  const peakDay = tPeak / PHYS.day;
-  // Simple rising + declining model
-  let scale = 1;
-  if (tDay < peakDay * 0.3) scale = Math.pow(tDay / (peakDay * 0.3), 2);
-  return mej * Q * eps * scale;
+  // Photon escape grows smoothly through diffusion; radioactive heating and
+  // thermalization then produce the physical power-law decline.
+  const escape = 1 - Math.exp(-Math.pow(tDay / Math.max(tPeakDays, 0.08), 2));
+  return mej * Q * eps * escape;
 }
 
 /** Effective temperature from luminosity */
@@ -1483,9 +1628,18 @@ function computeAllEMBands(tPost, params) {
 function getSimulationPhase(tPost) {
   if (tPost < 0) return 'inspiral';
   if (tPost < 0.05) return 'merger';
-  if (tPost < 1.5) return 'hypermassive_remnant';
-  if (tPost < 5) return 'grb';
-  if (tPost < 12) return 'black_hole_formation';
+
+  if (state.remnantType === 'black_hole') {
+    if (tPost < 1.2) return 'black_hole_formation';
+  } else if (state.remnantType === 'hypermassive_ns') {
+    if (tPost < 5) return 'hypermassive_remnant';
+  } else if (state.remnantType === 'supramassive_ns') {
+    if (tPost < 5) return 'supramassive_remnant';
+  } else {
+    if (tPost < 5) return 'stable_remnant';
+  }
+
+  if (tPost < 8) return 'grb';
   if (tPost < 0.5 * PHYS.day) return 'expanding_ejecta';
   if (tPost < 2 * PHYS.day) return 'early_kilonova';
   if (tPost < 10 * PHYS.day) return 'peak_kilonova';
@@ -1513,6 +1667,8 @@ const PHASE_NAMES = {
   merger: 'MERGER',
   post_merger: 'POST-MERGER',
   hypermassive_remnant: 'HYPERMASSIVE NEUTRON STAR',
+  supramassive_remnant: 'SUPRAMASSIVE NEUTRON STAR',
+  stable_remnant: 'STABLE MASSIVE NEUTRON STAR',
   grb: 'GAMMA-RAY BURST',
   black_hole_formation: 'BLACK HOLE FORMATION',
   expanding_ejecta: 'EXPANDING EJECTA',
@@ -1528,6 +1684,8 @@ const PHASE_COLORS = {
   merger: '#ff3366',
   post_merger: '#ff8800',
   hypermassive_remnant: '#ffd166',
+  supramassive_remnant: '#b388ff',
+  stable_remnant: '#66ffcc',
   grb: '#ffffff',
   black_hole_formation: '#ff6b35',
   expanding_ejecta: '#b388ff',
@@ -1541,14 +1699,16 @@ const PHASE_COLORS = {
 const EVOLUTION_TEXT = {
   inspiral: ['Inspiral', 'The stars lose orbital energy through gravitational waves and spiral closer together.'],
   merger: ['Collision', 'The stellar crusts collide, shock heating begins, and neutron-rich matter is torn away.'],
-  hypermassive_remnant: ['Hypermassive neutron star', 'The merged core is temporarily supported by extremely rapid rotation and thermal pressure. It shines intensely in neutrinos.'],
+  hypermassive_remnant: ['Hypermassive neutron star', 'Differential rotation and heat support a remnant above the uniform-rotation limit. It is not a black hole in this outcome.'],
+  supramassive_remnant: ['Supramassive neutron star', 'Uniform rotation supports the remnant above the nonrotating TOV limit. The central object remains a rapidly spinning neutron star.'],
+  stable_remnant: ['Stable massive neutron star', 'The remnant mass is below the TOV limit, so a long-lived massive neutron star remains at the centre.'],
   grb: ['Jet and gamma-ray burst', 'Magnetic fields help launch narrow relativistic jets along the poles. A jet aimed near Earth can produce a short gamma-ray burst.'],
   black_hole_formation: ['Collapse to a black hole', 'The temporary remnant can no longer resist gravity. It collapses, leaving a black hole surrounded by a hot accretion disk.'],
   expanding_ejecta: ['Expanding ejecta', 'Fast tidal debris and slower winds spread outward. Fresh heavy nuclei begin heating the cloud through radioactive decay.'],
   early_kilonova: ['Blue kilonova', 'Hot, relatively transparent polar ejecta glow first in ultraviolet and blue light.'],
   peak_kilonova: ['Red kilonova and heavy elements', 'The cloud cools and becomes redder. Gold, platinum, uranium, and other heavy elements are carried into space.'],
   afterglow: ['X-ray and radio afterglow', 'The jet and ejecta plough into surrounding gas, creating shocks that can glow for months or years.'],
-  final_remnant: ['Final remnant', 'A black hole and fading accretion flow remain at the centre while enriched debris continues drifting into interstellar space.']
+  final_remnant: ['Final remnant', 'The central object matches the mass-dependent outcome shown above, while enriched ejecta continue drifting into interstellar space.']
 };
 
 // ========================================================================
@@ -1575,6 +1735,8 @@ const EDUCATIONAL_CONTENT = [
   { id: 'strain', title: 'Gravitational Wave Strain', question: 'What does strain actually measure?', explanation: 'Strain tells us how much a gravitational wave changes the distance between two points. The effect is incredibly small. When a wave passes through a detector such as LIGO, it slightly stretches one arm while squeezing the other. The change is far smaller than the width of a proton, but laser interferometers are sensitive enough to measure it.', equation: 'h = ΔL / L', relatedPhase: 'inspiral', icon: '📏' },
   { id: 'gw170817', title: 'GW170817', question: 'Why was GW170817 so important?', explanation: 'On 17 August 2017, LIGO and Virgo detected gravitational waves from two neutron stars merging. Less than two seconds later, satellites recorded a gamma-ray burst from the same part of the sky. Telescopes then found the kilonova and followed it across many wavelengths. It was the first time one cosmic event had been studied through both gravitational waves and light, opening a new chapter in astronomy.', equation: null, relatedPhase: 'inspiral', icon: '🔭' },
   { id: 'distance', title: 'Cosmic Distance', question: 'How far away did GW170817 occur?', explanation: 'GW170817 happened about 40 megaparsecs away, which is roughly 130 million light-years. This means the light and gravitational waves travelled for about 130 million years before reaching Earth. The event also showed that gravitational waves can be used to estimate cosmic distances, giving astronomers a new way to study the expansion of the Universe.', equation: '1 Mpc ≈ 3.26 million light-years', relatedPhase: 'inspiral', icon: '🌌' },
+  { id: 'tov_limit', title: 'The TOV Limit', question: 'What is the maximum mass of a neutron star?', explanation: 'The Tolman Oppenheimer Volkoff limit, usually called the TOV limit, is the largest mass that a cold, nonrotating neutron star can support against gravity for a chosen equation of state. The exact value depends on how dense nuclear matter behaves. Rotation and heat can temporarily support a heavier remnant, which is why a merger does not always become a black hole immediately.', equation: 'M_remnant compared with M_TOV, 1.203 M_TOV, and M_prompt', relatedPhase: 'hypermassive_remnant', icon: '⚖️' },
+  { id: 'remnant_outcomes', title: 'Four Possible Remnants', question: 'Why do different masses leave different objects?', explanation: 'A system above the prompt-collapse threshold forms a black hole almost immediately. Below that threshold but above the uniform-rotation limit, it forms a hypermassive neutron star. Between the TOV and uniform-rotation limits, it forms a supramassive neutron star. Below the TOV limit, a stable massive neutron star can survive. The selected equation of state changes every one of these boundaries.', equation: null, relatedPhase: 'merger', icon: '🧭' },
 ];
 
 // ========================================================================
@@ -1589,7 +1751,7 @@ const state = {
   mergerTime: 0,       // computed time-to-merger from initial separation
   postMergerTime: 0,   // time after merger (can be negative)
   phase: 'inspiral',
-  userSpeed: 6,
+  userSpeed: 4,
   // Derived physics
   separation: 200000,
   orbitalPhase: 0,
@@ -1597,6 +1759,7 @@ const state = {
   gwPower: 0,
   chirpMass: 0,
   remnantType: '',
+  remnantDetails: null,
   ejecta: { dynamical: 0, wind: 0, total: 0, blueEjecta: 0, redEjecta: 0 },
   emBands: { gamma: 0, xray: 0, uv: 0, optical: 0, infrared: 0, radio: 0, neutrino: 0, totalKN: 0, blueTemp: 0, redTemp: 0 },
   totalEnergy: 0,
@@ -1627,11 +1790,13 @@ function initSimulation() {
   state.totalEnergy = 0;
   state.chirpMass = computeChirpMass(m1, m2);
   state.ejecta = computeTotalEjecta(m1, m2, eosModel);
-  state.remnantType = determineRemnantType(m1, m2, state.ejecta.total, eosModel);
+  state.remnantDetails = classifyRemnant(m1, m2, state.ejecta.total, eosModel);
+  state.remnantType = state.remnantDetails.type;
   state.waveformBuffer = [];
   state.emHistory = [];
   state.phase = 'inspiral';
   updatePhysics(0);
+  if (document.getElementById('timeline-track')?.querySelector('.tl-event')) initTimeline();
 }
 
 function updatePhysics(dtReal) {
@@ -1799,7 +1964,7 @@ function initThreeScene() {
   composer.addPass(new RenderPass(scene, camera));
   const bloom = new UnrealBloomPass(
     new THREE.Vector2(container.clientWidth, container.clientHeight),
-    0.82, 0.42, 0.72
+    0.95, 0.45, 0.6
   );
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
@@ -2101,24 +2266,60 @@ function createEjectaSystem() {
   scene.add(ejectaSystem);
 }
 
+function createRadialGlowTexture(innerColor, middleColor, outerColor) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  g.addColorStop(0, innerColor);
+  g.addColorStop(0.18, middleColor);
+  g.addColorStop(0.52, outerColor);
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 256, 256);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 function createKilonovaCloud() {
   const group = new THREE.Group();
-  const inner = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 48), new THREE.MeshBasicMaterial({
-    color: 0x9bc8ff, transparent: true, opacity: 0,
-    blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false
-  }));
-  const outer = new THREE.Mesh(new THREE.SphereGeometry(1.16, 48, 36), new THREE.MeshBasicMaterial({
-    color: 0xff7a42, transparent: true, opacity: 0,
-    wireframe: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false
-  }));
-  group.add(inner, outer);
-  group._inner = inner;
-  group._outer = outer;
+
+  const coreMat = new THREE.SpriteMaterial({
+    map: createRadialGlowTexture('rgba(255,255,255,1)', 'rgba(150,205,255,.82)', 'rgba(80,125,255,.08)'),
+    color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending,
+    depthWrite: false, depthTest: true, toneMapped: false
+  });
+  const haloMat = new THREE.SpriteMaterial({
+    map: createRadialGlowTexture('rgba(255,245,225,.75)', 'rgba(255,125,75,.34)', 'rgba(255,55,20,.02)'),
+    color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending,
+    depthWrite: false, depthTest: true, toneMapped: false
+  });
+  const bloomMat = new THREE.SpriteMaterial({
+    map: createRadialGlowTexture('rgba(255,255,255,.32)', 'rgba(255,185,125,.12)', 'rgba(255,80,25,0)'),
+    color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending,
+    depthWrite: false, depthTest: true, toneMapped: false
+  });
+
+  const core = new THREE.Sprite(coreMat);
+  const halo = new THREE.Sprite(haloMat);
+  const bloom = new THREE.Sprite(bloomMat);
+  core.scale.set(1, 1, 1);
+  halo.scale.set(1, 1, 1);
+  bloom.scale.set(1, 1, 1);
+  group.add(bloom, halo, core);
+  group._inner = core;
+  group._outer = halo;
+  group._bloom = bloom;
   group.visible = false;
   group.userData.label = 'Kilonova';
-  group.userData.description = 'A radioactive optical/infrared transient produced as merger ejecta expand and cool.';
-  inner.userData.hoverSource = group;
-  outer.userData.hoverSource = group;
+  group.userData.description = 'A compact radioactive glow that forms gradually, reddens, and fades as the ejecta cool.';
+  group.userData.currentSize = 10;
+
+  const light = new THREE.PointLight(0xffb080, 0, 90, 2);
+  group.add(light);
+  group._light = light;
+
   kilonovaCloud = group;
   scene.add(kilonovaCloud);
 }
@@ -2197,6 +2398,9 @@ function placeAnnotation(el, objectOrPosition, visible, offsetX=0, offsetY=0) {
   const y = (-pos.y * .5 + .5) * panel.clientHeight + offsetY;
   el.style.left = `${Math.max(55, Math.min(panel.clientWidth-55, x))}px`;
   el.style.top = `${Math.max(28, Math.min(panel.clientHeight-28, y))}px`;
+  // If the label sits left of its target point, flip the leader line so it
+  // still points back toward the object instead of off to the side.
+  el.classList.toggle('leader-right', offsetX < 0);
 }
 function updateSceneAnnotations() {
   const pre = state.postMergerTime < 0;
@@ -2211,9 +2415,22 @@ function updateSceneAnnotations() {
   placeAnnotation(annotationEls.remnant, mergerCore, post && mergerCore.visible && !bhVisible, 62, -30);
   placeAnnotation(annotationEls.blackhole, blackHoleMesh, bhVisible, 54, -42);
   placeAnnotation(annotationEls.disk, blackHoleMesh?._ring || new THREE.Vector3(), diskVisible, -72, 30);
-  placeAnnotation(annotationEls.ejecta, new THREE.Vector3(9, 1, 1), post && state.postMergerTime > .4 && ejectaSystem.material.opacity > .03, 40, 18);
-  placeAnnotation(annotationEls.jets, new THREE.Vector3(0, 12, 0), jet1 && jet1.visible && jet1.material.opacity > .03, 68, -10);
-  placeAnnotation(annotationEls.kilonova, new THREE.Vector3(-11, 5, 0), knVisible, -35, -10);
+
+  // Ejecta: point at the edge of the currently expanding cloud, not a fixed
+  // spot that gets left behind as the material spreads outward.
+  const ejEdge = Math.min(9.5, 1.6 + (ejectaSystem.userData.currentExpansion || 0) * 0.14);
+  placeAnnotation(annotationEls.ejecta, new THREE.Vector3(ejEdge * 0.72, ejEdge * 0.28, ejEdge * 0.55),
+    post && state.postMergerTime > .4 && ejectaSystem.material.opacity > .03, 40, 18);
+
+  // Jets: track the actual tip of the current jet cone (it grows from the
+  // remnant outward), rather than a point far above where it starts.
+  const jetTipY = jet1 ? jet1.position.y + 4 * jet1.scale.y : 12;
+  placeAnnotation(annotationEls.jets, new THREE.Vector3(0, jetTipY, 0), jet1 && jet1.visible && jet1.material.opacity > .03, 30, -14);
+
+  // Kilonova: anchor to the current edge of the glow, which grows over time.
+  const knSize = (kilonovaCloud.userData.currentSize || 10) * 0.55;
+  placeAnnotation(annotationEls.kilonova, new THREE.Vector3(-knSize * 0.62, knSize * 0.4, knSize * 0.18), knVisible, -35, -10);
+
   placeAnnotation(annotationEls.radio, new THREE.Vector3(12, -7, -2), state.postMergerTime > 9 * PHYS.day, 35, 12);
 }
 
@@ -2332,7 +2549,7 @@ function updateScene(time) {
     starGlow2.visible = false;
     orbitTrail1.visible = false;
     orbitTrail2.visible = false;
-    const remnantHold = postMerger && state.postMergerTime < 14;
+    const remnantHold = postMerger && state.postMergerTime < 0.15;
     mergerCore.visible = remnantHold;
     mergerHalo.visible = remnantHold;
     lensingRing.visible = remnantHold;
@@ -2406,9 +2623,12 @@ function updateScene(time) {
   // === Ejecta ===
   if (postMerger && state.postMergerTime > 0.08) {
     const age = Math.max(0, state.postMergerTime - 0.08);
+    const ageDays = age / PHYS.day;
     const ejectaFade = THREE.MathUtils.smootherstep(Math.min(age / 3.8, 1), 0, 1);
-    const expansionScale = Math.min(52, Math.log1p(age * 2.2) * 8.4);
-    ejectaSystem.material.opacity = ejectaFade * Math.max(0.10, 1 - Math.log1p(age) / 18);
+    const expansionScale = Math.min(72, Math.log1p(age * 2.2) * 8.4);
+    // As density falls roughly as t^-3, individual glowing knots become much
+    // less conspicuous. Radioactive luminosity is carried by the cloud below.
+    ejectaSystem.material.opacity = ejectaFade * Math.exp(-ageDays / 28);
     const positions = ejectaSystem.geometry.attributes.position.array;
     const vels = ejectaSystem.geometry._velocities;
     for (let i = 0; i < positions.length / 3; i++) {
@@ -2418,39 +2638,69 @@ function updateScene(time) {
       positions[i*3+2] = vels[i*3+2] * expansionScale + vels[i*3] * swirl;
     }
     ejectaSystem.geometry.attributes.position.needsUpdate = true;
+    ejectaSystem.userData.currentExpansion = expansionScale;
   } else {
     ejectaSystem.material.opacity = 0;
+    ejectaSystem.userData.currentExpansion = 0;
   }
 
-  // === Kilonova Cloud ===
-  if (postMerger && state.postMergerTime > 2.0) {
-    kilonovaCloud.visible = true;
-    const ageSec = Math.max(0, state.postMergerTime - 2.0);
-    const visualAge = Math.log1p(ageSec) / Math.log(1 + 12 * PHYS.day);
-    const reveal = THREE.MathUtils.smootherstep(Math.min(ageSec / 8, 1), 0, 1);
-    const tDays = Math.max(ageSec / PHYS.day, 1e-5);
-    const cinematicAge = Math.min(1, ageSec / 45);
-    const knScale = 1.35 + 8.5 * THREE.MathUtils.smootherstep(cinematicAge, 0, 1) + Math.min(30, Math.pow(Math.max(visualAge, 0), 0.72) * 30);
-    kilonovaCloud.scale.setScalar(knScale);
-    kilonovaCloud.rotation.y = time * 0.012;
+  // === Kilonova Glow ===
+  if (postMerger && state.postMergerTime > 0.6) {
+    const ageSec = Math.max(0, state.postMergerTime - 0.6);
+    const ageDays = ageSec / PHYS.day;
+    const formation = THREE.MathUtils.smootherstep(Math.min(ageSec / 18, 1), 0, 1);
+    const visualAge = Math.log1p(ageSec) / Math.log(1 + 365 * PHYS.day);
+    // Brightness follows the computed bolometric light curve. There is no
+    // artificial late-time floor: the kilonova now genuinely fades away.
+    const brightness = formation * THREE.MathUtils.clamp(
+      Math.pow(Math.max(0, state.emBands.totalKN) / 8e41, 0.48), 0, 1
+    );
 
-    const blueT = state.emBands.blueTemp;
-    const redT = state.emBands.redTemp;
-    const modelT = Math.max(2500, blueT, redT);
-    const coolingT = THREE.MathUtils.lerp(10500, 2800, Math.min(1, visualAge * 1.15));
-    const rgb = temperatureToRGB(Math.max(modelT, coolingT));
-    const brightnessModel = Math.min(1, state.emBands.totalKN / 1e42);
-    const visibleBrightness = Math.max(0.62 * reveal, brightnessModel);
-    const redShift = THREE.MathUtils.smootherstep(Math.min(visualAge, 1), 0.18, 0.95);
+    // Homologous expansion is compressed logarithmically for a readable scene.
+    const growth = THREE.MathUtils.smootherstep(Math.min(ageSec / 70, 1), 0, 1);
+    const slowExpansion = Math.min(3.2, Math.pow(Math.max(visualAge, 0), 0.62) * 3.2);
+    const coreSize = 4.8 + 2.5 * growth + 2.2 * slowExpansion;
+    const haloSize = 8.2 + 5.0 * growth + 5.2 * slowExpansion;
+    const bloomSize = 12.0 + 6.5 * growth + 7.2 * slowExpansion;
+    kilonovaCloud._inner.scale.set(coreSize, coreSize, 1);
+    kilonovaCloud._outer.scale.set(haloSize, haloSize, 1);
+    kilonovaCloud._bloom.scale.set(bloomSize, bloomSize, 1);
+    kilonovaCloud.userData.currentSize = haloSize;
 
-    kilonovaCloud._inner.material.color.setRGB(rgb[0], rgb[1], rgb[2]);
-    kilonovaCloud._inner.material.opacity = reveal * visibleBrightness * (0.34 - 0.10 * redShift);
-    kilonovaCloud._outer.material.color.setRGB(0.78 + 0.22 * redShift, 0.48 - 0.23 * redShift, 0.28 - 0.16 * redShift);
-    kilonovaCloud._outer.material.opacity = reveal * (0.10 + 0.14 * redShift) * Math.max(0.35, 1 - visualAge * 0.45);
+    // Use luminosity-weighted photospheric temperature for the colour rather
+    // than elapsed-time colour stops. The red component naturally takes over.
+    const blueL = computeKilonovaLuminosity(ageSec, state.ejecta.blueEjecta, 'blue');
+    const redL = computeKilonovaLuminosity(ageSec, state.ejecta.redEjecta, 'red');
+    const weightedTemp = (blueL * state.emBands.blueTemp + redL * state.emBands.redTemp) /
+      Math.max(blueL + redL, 1);
+    const rgb = temperatureToRGB(THREE.MathUtils.clamp(weightedTemp, 1300, 12000));
+    const coreColor = new THREE.Color(rgb[0], rgb[1], rgb[2]);
+    const haloColor = coreColor.clone().lerp(new THREE.Color(0xff3b18),
+      THREE.MathUtils.smootherstep(Math.min(ageDays / 12, 1), 0.15, 1) * 0.42);
+    kilonovaCloud._inner.material.color.copy(coreColor);
+    kilonovaCloud._outer.material.color.copy(haloColor);
+    kilonovaCloud._bloom.material.color.copy(haloColor);
+
+    // Smooth rise and smooth disappearance, with no sudden pop. Opacity
+    // ceilings raised substantially so the kilonova is unmistakably visible.
+    kilonovaCloud._inner.material.opacity = Math.min(0.96, brightness * 0.92);
+    kilonovaCloud._outer.material.opacity = Math.min(0.72, brightness * 0.68);
+    kilonovaCloud._bloom.material.opacity = Math.min(0.36, brightness * 0.34);
+    kilonovaCloud.visible = brightness > 0.006;
+
+    // A soft point light lets the glow cast real illumination on the ejecta
+    // and surrounding scene, reinforcing that this is the dominant light
+    // source in the post-merger view.
+    if (kilonovaCloud._light) {
+      kilonovaCloud._light.color.copy(haloColor);
+      kilonovaCloud._light.intensity = brightness * 34;
+    }
   } else {
     kilonovaCloud.visible = false;
     kilonovaCloud._inner.material.opacity = 0;
     kilonovaCloud._outer.material.opacity = 0;
+    if (kilonovaCloud._bloom) kilonovaCloud._bloom.material.opacity = 0;
+    if (kilonovaCloud._light) kilonovaCloud._light.intensity = 0;
   }
 
   // === Jets ===
@@ -2473,25 +2723,48 @@ function updateScene(time) {
     jet1.visible = false; jet2.visible = false;
   }
 
-  // === Black Hole ===
-  const collapseTime = state.remnantType === 'black_hole' ? 3.2 :
-                       state.remnantType === 'hypermassive_ns' ? 8.0 :
-                       state.remnantType === 'supramassive_ns' ? PHYS.day : Infinity;
-  const hasCollapsed = postMerger && state.postMergerTime > collapseTime;
-  if (hasCollapsed) {
+  // === Mass-dependent central remnant ===
+  const remnantAge = Math.max(0, state.postMergerTime);
+  const showCentralRemnant = postMerger && remnantAge > 0.15;
+  const isPromptBH = state.remnantType === 'black_hole';
+
+  if (showCentralRemnant && isPromptBH) {
     blackHoleMesh.visible = true;
     blackHoleMesh._ring.visible = true;
-    const t = THREE.MathUtils.smootherstep(Math.min(1, (state.postMergerTime - collapseTime) / Math.max(2.8, collapseTime * 0.25)), 0, 1);
+    const t = THREE.MathUtils.smootherstep(Math.min(1, (remnantAge - 0.15) / 1.2), 0, 1);
     blackHoleMesh.material.opacity = t;
-    const diskFade = Math.max(0.18, 1 - Math.log1p(Math.max(0, state.postMergerTime - collapseTime)) / 22);
+    const diskFade = Math.max(0.18, 1 - Math.log1p(remnantAge) / 22);
     blackHoleMesh._ring.material.opacity = t * 0.68 * diskFade;
     blackHoleMesh._ring.rotation.z = time * 0.5;
-  } else if (postMerger && state.postMergerTime > 0.1) {
-    blackHoleMesh.visible = false;
-    blackHoleMesh._ring.visible = false;
+    mergerCore.visible = false;
+    mergerHalo.visible = false;
+    lensingRing.visible = false;
   } else {
     blackHoleMesh.visible = false;
     blackHoleMesh._ring.visible = false;
+
+    if (showCentralRemnant) {
+      mergerCore.visible = true;
+      mergerHalo.visible = true;
+      lensingRing.visible = true;
+      const pulse = 1 + 0.035 * Math.sin(time * (state.remnantType === 'hypermassive_ns' ? 6.5 : 3.2));
+      const visual = {
+        hypermassive_ns: { core: 0xffd166, halo: 0xff7a59, scale: 2.62, spin: 1.65 },
+        supramassive_ns: { core: 0xb388ff, halo: 0x6677ff, scale: 2.42, spin: 1.12 },
+        stable_ns: { core: 0x66ffcc, halo: 0x33aaff, scale: 2.22, spin: 0.72 }
+      }[state.remnantType] || { core: 0xffffff, halo: 0x66aaff, scale: 2.3, spin: 1.0 };
+      mergerCore.scale.setScalar(visual.scale * pulse);
+      mergerHalo.scale.setScalar((visual.scale + 0.75) * pulse);
+      lensingRing.scale.setScalar(visual.scale + 0.65);
+      mergerCore.material.color.setHex(visual.core);
+      mergerHalo.material.color.setHex(visual.halo);
+      mergerCore.material.opacity = 0.50;
+      mergerHalo.material.opacity = 0.12;
+      lensingRing.material.opacity = 0.25;
+      mergerCore.rotation.y = time * visual.spin;
+      mergerHalo.rotation.y = -time * visual.spin * 0.35;
+      lensingRing.rotation.z = time * visual.spin * 0.45;
+    }
   }
 
   // Camera position and OrbitControls target are intentionally left untouched here.
@@ -2499,6 +2772,81 @@ function updateScene(time) {
   starField.rotation.y = time * 0.0025;
   controls.update();
   updateSceneAnnotations();
+}
+
+
+// Laboratory-style plotting helpers
+function formatObserverTime(t) {
+  if (t < 120) return `${t.toFixed(0)} s`;
+  if (t < PHYS.day) return `${(t / 3600).toFixed(1)} h`;
+  if (t < 21 * PHYS.day) return `${(t / PHYS.day).toFixed(1)} d`;
+  if (t < 300 * PHYS.day) return `${(t / (7 * PHYS.day)).toFixed(1)} wk`;
+  return `${(t / (365 * PHYS.day)).toFixed(2)} yr`;
+}
+
+function logNormalPulse(t, peak, width) {
+  return Math.exp(-0.5 * Math.pow(Math.log10(Math.max(t, 1e-6) / peak) / width, 2));
+}
+
+function thermalizationEfficiencyLab(tDays) {
+  const x = Math.max(tDays, 1e-6);
+  return Math.max(0.05, Math.min(0.72,
+    0.36 * (Math.exp(-0.56 * x) + Math.log(1 + 0.34 * Math.pow(x, 0.74)) /
+    (0.34 * Math.pow(x, 0.74)))
+  ));
+}
+
+function greyDiffusionLuminosity(tSec, massSolar, opacity, velocityFractionC) {
+  if (massSolar <= 0 || tSec <= 0) return 0;
+  const massKg = massSolar * PHYS.M_sun;
+  const tDays = Math.max(tSec / PHYS.day, 1e-6);
+  const heatingWkg = 2e3 * Math.pow(tDays, -1.3);
+  const diffusionTime = Math.sqrt(
+    3 * opacity * massKg / (4 * Math.PI * velocityFractionC * PHYS.c * PHYS.c)
+  );
+  const release = 1 - Math.exp(-Math.pow(tSec / Math.max(diffusionTime, 1), 2));
+  return massKg * heatingWkg * thermalizationEfficiencyLab(tDays) * release;
+}
+
+function generateLaboratoryEMSamples(sampleCount = 180) {
+  const ej = state.ejecta;
+  const blueMass = Math.max(1e-4, 0.25 * (state.remnantDetails?.diskMass || 0.05) + 0.18 * ej.dynamical);
+  const redMass = Math.max(1e-4, 0.82 * ej.dynamical + 0.15 * (state.remnantDetails?.diskMass || 0.05));
+  const angle = state.params.viewAngle * Math.PI / 180;
+  const beaming = Math.exp(-0.5 * Math.pow(angle / 0.10, 2));
+  const samples = [];
+  const end = 365 * PHYS.day;
+
+  for (let i = 0; i < sampleCount; i++) {
+    const t = Math.pow(10, (i / (sampleCount - 1)) * Math.log10(end));
+    const blueW = greyDiffusionLuminosity(t, blueMass, 0.05, 0.25);
+    const redW = greyDiffusionLuminosity(t, redMass, 0.50, 0.12);
+    const bolometricW = blueW + redW;
+
+    const weightedV = (blueW * 0.25 + redW * 0.12) / Math.max(bolometricW, 1);
+    const radius = Math.max(1e6, weightedV * PHYS.c * t);
+    const temp = Math.max(900, Math.min(30000,
+      Math.pow(bolometricW / (4 * Math.PI * 5.670e-8 * radius * radius), 0.25)
+    ));
+
+    const uvFraction = temp > 9000 ? 0.30 : temp > 6000 ? 0.12 : 0.02;
+    const opticalFraction = temp > 6500 ? 0.50 : temp > 3500 ? 0.38 : 0.14;
+    const infraredFraction = Math.max(0.05, 1 - uvFraction - opticalFraction);
+
+    samples.push({
+      t,
+      gamma: 1e46 * beaming * logNormalPulse(t, 1.5, 0.22) * 1e7,
+      xray: 2e42 * Math.max(beaming, 0.004) * logNormalPulse(t, 80 * PHYS.day, 0.72),
+      uv: bolometricW * uvFraction * 1e7,
+      optical: bolometricW * opticalFraction * 1e7,
+      infrared: bolometricW * infraredFraction * 1e7,
+      radio: 8e38 * Math.max(beaming, 0.012) * logNormalPulse(t, 150 * PHYS.day, 0.85),
+      neutrino: 3e52 * Math.exp(-t / 0.7),
+      bolometric: bolometricW * 1e7,
+      temperature: temp
+    });
+  }
+  return samples;
 }
 
 // ========================================================================
@@ -2517,85 +2865,88 @@ function drawGWPanel() {
   if (!canvas.width) initGWPanel();
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
-
-  ctx.fillStyle = 'rgba(5, 5, 16, 0.95)';
+  ctx.fillStyle = 'rgba(5, 5, 16, 0.96)';
   ctx.fillRect(0, 0, W, H);
 
   const buf = state.waveformBuffer;
-  if (buf.length < 2) {
+  if (buf.length < 3) {
     ctx.fillStyle = '#556677';
     ctx.font = '12px Inter';
-    ctx.fillText('Waiting for signal...', W/2 - 60, H/2);
+    ctx.fillText('Waiting for inspiral signal...', Math.max(12, W / 2 - 78), H / 2);
     return;
   }
 
-  // Axes
-  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  const margin = { left: 48, right: 10, top: 8, bottom: 14 };
+  const plotW = W - margin.left - margin.right;
+  const usableH = H - margin.top - margin.bottom;
+  const bandGap = 7;
+  const bandH = (usableH - 2 * bandGap) / 3;
+  const strainTop = margin.top;
+  const freqTop = strainTop + bandH + bandGap;
+  const ampTop = freqTop + bandH + bandGap;
+
+  let maxStrain = 1e-30, maxFreq = 1, maxAmp = 1e-30;
+  for (const d of buf) {
+    maxStrain = Math.max(maxStrain, Math.abs(d.h || 0));
+    maxFreq = Math.max(maxFreq, d.f || 0);
+    maxAmp = Math.max(maxAmp, Math.abs(d.amp || d.h || 0));
+  }
+
+  const x = i => margin.left + i / Math.max(1, buf.length - 1) * plotW;
+  const strainY = v => strainTop + bandH / 2 - (v / maxStrain) * (bandH * 0.44);
+  const freqY = v => freqTop + bandH - (v / maxFreq) * (bandH * 0.86);
+  const ampY = v => ampTop + bandH - (Math.abs(v) / maxAmp) * (bandH * 0.86);
+
+  ctx.strokeStyle = 'rgba(100,125,155,0.18)';
   ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(40, H/2);
-  ctx.lineTo(W - 10, H/2);
-  ctx.stroke();
+  [strainTop, strainTop + bandH / 2, strainTop + bandH,
+   freqTop, freqTop + bandH, ampTop, ampTop + bandH].forEach(y => {
+    ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(W - margin.right, y); ctx.stroke();
+  });
 
-  // Labels
-  ctx.fillStyle = '#556677';
-  ctx.font = '9px JetBrains Mono';
-  ctx.fillText('h(t)', 5, H/2 - 5);
-  ctx.fillText('time →', W - 45, H - 5);
-
-  // Find amplitude range
-  let maxH = 0;
-  for (const s of buf) maxH = Math.max(maxH, Math.abs(s.h));
-  if (maxH < 1e-30) maxH = 1e-22;
-
-  // Draw waveform
-  ctx.beginPath();
-  const margin = 45;
-  for (let i = 0; i < buf.length; i++) {
-    const x = margin + (i / (buf.length - 1)) * (W - margin - 10);
-    const y = H/2 - (buf[i].h / maxH) * (H/2 - 15);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-
-  // Color gradient based on frequency
-  const gradient = ctx.createLinearGradient(margin, 0, W, 0);
-  gradient.addColorStop(0, '#00aa44');
-  gradient.addColorStop(0.7, '#00ff88');
-  gradient.addColorStop(1, '#ffffff');
-  ctx.strokeStyle = gradient;
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Strain scale
-  ctx.fillStyle = '#4488aa';
+  ctx.fillStyle = '#718096';
   ctx.font = '8px JetBrains Mono';
-  ctx.fillText(`±${formatSci(maxH)}`, 2, 12);
+  ctx.fillText('strain', 5, strainTop + 10);
+  ctx.fillText('dimensionless', 5, strainTop + 20);
+  ctx.fillText('frequency', 5, freqTop + 10);
+  ctx.fillText('Hz', 5, freqTop + 20);
+  ctx.fillText('amplitude', 5, ampTop + 10);
 
-  // Merger line
-  if (state.postMergerTime >= -0.5 && state.postMergerTime < 1) {
-    const mergerIdx = buf.findIndex(s => s.t >= 0);
-    if (mergerIdx > 0) {
-      const mx = margin + (mergerIdx / (buf.length - 1)) * (W - margin - 10);
-      ctx.strokeStyle = 'rgba(255, 51, 102, 0.6)';
-      ctx.setLineDash([3, 3]);
-      ctx.beginPath();
-      ctx.moveTo(mx, 5);
-      ctx.lineTo(mx, H - 5);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#ff3366';
-      ctx.font = '9px Inter';
-      ctx.fillText('MERGER', mx + 4, 14);
-    }
-  }
+  // Strain chirp
+  ctx.beginPath();
+  buf.forEach((d, i) => i ? ctx.lineTo(x(i), strainY(d.h || 0)) : ctx.moveTo(x(i), strainY(d.h || 0)));
+  ctx.strokeStyle = '#67e8f9';
+  ctx.lineWidth = 1.25;
+  ctx.stroke();
 
-  // Frequency readout
-  if (state.fGW > 0) {
-    ctx.fillStyle = '#00d4ff';
-    ctx.font = '10px JetBrains Mono';
-    ctx.fillText(`f = ${state.fGW.toFixed(0)} Hz`, W - 80, 14);
-  }
+  // Frequency rise
+  ctx.beginPath();
+  buf.forEach((d, i) => i ? ctx.lineTo(x(i), freqY(d.f || 0)) : ctx.moveTo(x(i), freqY(d.f || 0)));
+  ctx.strokeStyle = '#fbbf24';
+  ctx.lineWidth = 1.35;
+  ctx.stroke();
+
+  // Intrinsic amplitude envelope
+  ctx.beginPath();
+  buf.forEach((d, i) => {
+    const a = Math.abs(d.amp || d.h || 0);
+    i ? ctx.lineTo(x(i), ampY(a)) : ctx.moveTo(x(i), ampY(a));
+  });
+  ctx.strokeStyle = '#fb7185';
+  ctx.lineWidth = 1.35;
+  ctx.stroke();
+
+  ctx.fillStyle = '#8fa5c5';
+  ctx.font = '8px JetBrains Mono';
+  ctx.textAlign = 'right';
+  ctx.fillText(`${maxFreq.toFixed(0)} Hz`, margin.left - 3, freqTop + 8);
+  ctx.fillText(formatSci(maxStrain), margin.left - 3, strainTop + 8);
+  ctx.textAlign = 'left';
+
+  const currentX = x(buf.length - 1);
+  ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(currentX, margin.top); ctx.lineTo(currentX, H - margin.bottom); ctx.stroke();
 }
 
 // ========================================================================
@@ -2718,32 +3069,85 @@ function drawEMPanel() {
 }
 
 // ========================================================================
+// PREDICTED MERGER OUTCOME PANEL
+// ========================================================================
+function initRemnantPanel() {
+  updatePredictedOutcomePanel();
+}
+
+function updatePredictedOutcomePanel() {
+  if (!state.remnantDetails) return;
+  const d = state.remnantDetails;
+  const labels = {
+    black_hole: 'Prompt black hole',
+    hypermassive_ns: 'Hypermassive neutron star',
+    supramassive_ns: 'Supramassive neutron star',
+    stable_ns: 'Stable massive neutron star'
+  };
+  const remnantEl = document.getElementById('outcome-remnant');
+  if (!remnantEl) return;
+
+  const diskMass = computeDiskMass(d.type);
+  const ejectaMass = state.ejecta?.dynamical ?? 0;
+  const windUpper = Math.max(0, state.ejecta?.wind ?? 0);
+
+  remnantEl.textContent = labels[d.type] || REMNANT_LABELS[d.type] || 'Unknown';
+  document.getElementById('outcome-threshold').textContent =
+    `Total ${d.totalMass.toFixed(2)} M☉ · prompt-collapse threshold ${d.mPrompt.toFixed(2)} ± ${d.promptUncertainty.toFixed(2)} M☉`;
+  document.getElementById('outcome-ejecta').textContent = `${ejectaMass.toExponential(2)} M☉`;
+  document.getElementById('outcome-ejecta-note').textContent =
+    `Estimated dynamical component · characteristic merger ejecta before disk winds.`;
+  document.getElementById('outcome-disk').textContent = `${diskMass.toFixed(3)} M☉`;
+  document.getElementById('outcome-disk-note').textContent =
+    `Up to ${windUpper.toFixed(3)} M☉ is represented as a post-merger wind in this model.`;
+  document.getElementById('outcome-reason').textContent = d.reason;
+  document.getElementById('outcome-validity').textContent =
+    `Numerical-relativity surrogate · ${d.validity.replace('-', ' ')}`;
+
+  const outcomeColors = {
+    black_hole: '#ff5577', hypermassive_ns: '#ffd166',
+    supramassive_ns: '#b388ff', stable_ns: '#00ff88'
+  };
+  remnantEl.style.color = outcomeColors[d.type] || '#e0e8f0';
+}
+
+function drawRemnantPanel() {
+  updatePredictedOutcomePanel();
+}
+
+// ========================================================================
 // SECTION 17: TIMELINE
 // ========================================================================
 
-const TIMELINE_EVENTS = [
-  { time: -5, label: 'Inspiral', phase: 'inspiral' },
-  { time: -0.1, label: 'Late Inspiral', phase: 'inspiral' },
-  { time: 0, label: 'Merger', phase: 'merger' },
-  { time: 0.15, label: 'HMNS', phase: 'hypermassive_remnant' },
-  { time: 1.7, label: 'GRB', phase: 'grb' },
-  { time: 8, label: 'Black hole', phase: 'black_hole_formation' },
-  { time: 120, label: 'Ejecta', phase: 'expanding_ejecta' },
-  { time: 0.5 * PHYS.day, label: 'Blue KN', phase: 'early_kilonova' },
-  { time: 3 * PHYS.day, label: 'Red KN', phase: 'peak_kilonova' },
-  { time: 9 * PHYS.day, label: 'X-ray', phase: 'afterglow' },
-  { time: 16 * PHYS.day, label: 'Radio', phase: 'afterglow' },
-  { time: 155 * PHYS.day, label: 'AG Peak', phase: 'afterglow' },
-  { time: 200 * PHYS.day, label: 'Remnant', phase: 'final_remnant' },
-];
+function getTimelineEvents() {
+  const events = [
+    { time: -5, label: 'Inspiral', phase: 'inspiral' },
+    { time: 0, label: 'Merger', phase: 'merger' }
+  ];
+  events.push(
+    { time: 1.7, label: 'GRB', phase: 'grb' },
+    { time: 0.7 * PHYS.day, label: 'Blue KN', phase: 'early_kilonova' },
+    { time: 4 * PHYS.day, label: 'Red / IR', phase: 'peak_kilonova' },
+    { time: 155 * PHYS.day, label: 'Afterglow', phase: 'afterglow' },
+    { time: 365 * PHYS.day, label: 'Faded', phase: 'final_remnant' }
+  );
+  return events;
+}
+
+let TIMELINE_EVENTS = [];
 
 function initTimeline() {
   const track = document.getElementById('timeline-track');
-  for (const evt of TIMELINE_EVENTS) {
+  track.querySelectorAll('.tl-event').forEach(el => el.remove());
+  TIMELINE_EVENTS = getTimelineEvents();
+  for (const [index, evt] of TIMELINE_EVENTS.entries()) {
     const el = document.createElement('div');
     el.className = 'tl-event';
     el.innerHTML = `<span>${evt.label}</span><div class="dot"></div>`;
     el.dataset.time = evt.time;
+    if (index % 2 === 1) el.classList.add('below');
+    if (index === 0) el.classList.add('edge-start');
+    if (index === TIMELINE_EVENTS.length - 1) el.classList.add('edge-end');
     track.appendChild(el);
   }
   layoutTimelineEvents();
@@ -2761,33 +3165,37 @@ function layoutTimelineEvents() {
 }
 
 function timeToTimelinePercent(t) {
-  // Map the full time range (-mergerTime to 200*day) to 0-1 using log-ish scale
+  // Map the full time range (-mergerTime to 200*day) to 0-1. Pre-merger is
+  // linear; post-merger uses a log1p scale that starts exactly at 0 when
+  // t=0, so it joins the pre-merger segment with zero discontinuity (the
+  // old log10(max(t,0.01)) version jumped backward for the first second
+  // after merger, which read as the timeline "restarting").
   const tMin = -Math.max(10, state.mergerTime);
-  const tMax = 200 * PHYS.day;
+  const tMax = 365 * PHYS.day;
   if (t <= 0) return 0.15 * (1 + t / Math.abs(tMin)); // -10..0 maps to 0..0.15
-  // Post-merger: log scale
-  const logT = Math.log10(Math.max(t, 0.01));
-  const logMax = Math.log10(tMax);
-  return 0.15 + 0.85 * (logT / logMax);
+  const t0 = 1; // characteristic scale (s) — keeps the first seconds readable
+  const num = Math.log1p(t / t0);
+  const den = Math.log1p(tMax / t0);
+  return 0.15 + 0.85 * (num / den);
 }
 
 
 function timelinePercentToTime(pct) {
   const p = THREE.MathUtils.clamp(pct, 0, 1);
   const preStart = -Math.max(10, state.mergerTime);
-  const tMax = 200 * PHYS.day;
+  const tMax = 365 * PHYS.day;
   if (p <= 0.15) return preStart * (1 - p / 0.15);
   const q = (p - 0.15) / 0.85;
-  const logMin = Math.log10(0.01);
-  const logMax = Math.log10(tMax);
-  return Math.pow(10, logMin + q * (logMax - logMin));
+  const t0 = 1;
+  const den = Math.log1p(tMax / t0);
+  return t0 * (Math.exp(q * den) - 1);
 }
 
 function rebuildEMHistory(targetPostTime) {
   state.emHistory = [];
   if (targetPostTime <= 0.5) return;
   const bandsParams = { ...state.params };
-  const maxT = Math.min(targetPostTime, 200 * PHYS.day);
+  const maxT = Math.min(targetPostTime, 365 * PHYS.day);
   const samples = 150;
   const t0 = 0.5;
   const log0 = Math.log(t0);
@@ -2809,6 +3217,7 @@ function seekToPostMergerTime(targetPostTime) {
   updateTimeline();
   drawGWPanel();
   drawEMPanel();
+  drawRemnantPanel();
 }
 
 function initTimelineScrubbing() {
@@ -2870,6 +3279,11 @@ function updateInfoPanel() {
   const collapseTimeForInfo = state.remnantType === 'black_hole' ? 3.2 : state.remnantType === 'hypermassive_ns' ? 8.0 : state.remnantType === 'supramassive_ns' ? PHYS.day : Infinity;
   if (state.postMergerTime > collapseTimeForInfo) displayedRemnant = 'Black Hole + Disk';
   document.getElementById('info-remnant').textContent = state.postMergerTime > 0 ? displayedRemnant : '—';
+  if (state.remnantDetails) {
+    document.getElementById('info-tov').textContent = `${state.remnantDetails.mTOV.toFixed(2)} M☉`;
+    document.getElementById('info-uniform').textContent = `${state.remnantDetails.mUniform.toFixed(2)} M☉`;
+    document.getElementById('info-prompt').textContent = `${state.remnantDetails.mPrompt.toFixed(2)} M☉`;
+  }
   document.getElementById('info-ejecta').textContent = state.postMergerTime > 0 ? `${formatSci(state.ejecta.total)} M☉` : '—';
   document.getElementById('info-lum').textContent = state.emBands.totalKN > 0 ? `${formatSci(state.emBands.totalKN)} erg/s` : '—';
   const maxT = Math.max(state.emBands.blueTemp, state.emBands.redTemp);
@@ -2966,6 +3380,8 @@ function resetAndRecompute() {
   kilonovaCloud.visible = false;
   kilonovaCloud._inner.material.opacity = 0;
   kilonovaCloud._outer.material.opacity = 0;
+  if (kilonovaCloud._bloom) kilonovaCloud._bloom.material.opacity = 0;
+  if (kilonovaCloud._light) kilonovaCloud._light.intensity = 0;
   shockWave.material.opacity = 0;
   jet1.material.opacity = 0; jet2.material.opacity = 0;
   blackHoleMesh.material.opacity = 0;
@@ -2973,6 +3389,10 @@ function resetAndRecompute() {
   if (mergerCore) { mergerCore.visible = false; mergerCore.material.opacity = 0; }
   if (mergerHalo) { mergerHalo.visible = false; mergerHalo.material.opacity = 0; }
   if (lensingRing) { lensingRing.visible = false; lensingRing.material.opacity = 0; }
+
+  updateInfoPanel();
+  updatePredictedOutcomePanel();
+  drawEMPanel();
 }
 
 // ========================================================================
@@ -3073,6 +3493,7 @@ function init() {
   initControls();
   initEducation();
   updateInfoPanel();
+  initRemnantPanel();
 
   // Start animation loop
   requestAnimationFrame(animate);
